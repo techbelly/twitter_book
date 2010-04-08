@@ -68,5 +68,7 @@ class TwitterBackup
       puts [id,date,text].join("\t")
     end
 end
- 
-TwitterBackup.new.retweets(ARGV[0],ARGV[1])
+
+username,password = ARGV[0],ARGV[1]
+TwitterBackup.new.tweets(username,password)
+TwitterBackup.new.retweets(username,password)

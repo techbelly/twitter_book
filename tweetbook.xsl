@@ -55,10 +55,10 @@
                 			</fo:block-container>
                 			<fo:block-container break-before="page" font-size="14pt" font-family="JansonText" text-align="center" text-align-last="center" >
                 				<fo:block>
-                					http://www.twitter.com/beng
+                					http://www.twitter.com/USERNAME
                 				</fo:block>
                 				<fo:block space-before="30mm" font-style="italic">
-                				    For Leonard, my monster, in the hope that you come to know me as a friend as well as a father.
+                				    Maybe a bit of a dedication here.
                 				</fo:block>
                 			</fo:block-container>
                 		</fo:flow>
