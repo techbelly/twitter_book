@@ -13,3 +13,5 @@ So...
 	$ fop tweetbook.fo tweetbook.pdf
 	
 Right now, I'm getting one printed using Lulu.com, I'll let you know how it goes.
+
+An example of the sort of thing to expect: http://www.techbelly.com/tweet.pdf
