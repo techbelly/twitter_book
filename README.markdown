@@ -7,9 +7,9 @@ Well, nearly everything. These scripts will help you generate some XML:FO that y
 
 So...
 
-	get_tweets username password > all_my_tweets.tsv
-	generate_xml < all_my_tweets.tsv > all_my_tweets.xml
-	xsltproc tweetbook.xsl tweetbook.fo
-	fop tweetbook.fo tweetbook.pdf
+	$ ./get_tweets username password > all_my_tweets.tsv
+	$ ./generate_xml < all_my_tweets.tsv > all_my_tweets.xml
+	$ xsltproc tweetbook.xsl tweetbook.fo
+	$ fop tweetbook.fo tweetbook.pdf
 	
 Right now, I'm getting one printed using Lulu.com, I'll let you know how it goes.
