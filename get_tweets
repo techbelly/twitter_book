@@ -1,0 +1,72 @@
+#!/usr/bin/env ruby
+ 
+require 'rubygems'
+require 'json'
+require 'net/http'
+require 'uri'
+require 'time'
+
+module TwitterAPI
+  
+  def api_call(method,page,username,password)
+    url = URI::parse('http://twitter.com')
+    req = Net::HTTP::Get.new("#{method}?screen_name=#{username}&page=#{page}&count=200")
+    req.basic_auth(username, password) if password
+    res = Net::HTTP.start(url.host, url.port) {|http| http.request(req) }
+    JSON.parse(res.body)
+  end
+  
+  def all_tweets(method,username,password=nil)
+    page = 1
+    loop do
+      begin
+        tweets = api_call(method,page,username,password)
+        break if tweets.length == 0
+        tweets.each { |tweet| yield tweet }
+        page += 1 
+        sleep 5
+      rescue
+        $stderr.puts "Error getting page #{page}: will retry in 30secs"
+        sleep 30
+      end
+    end
+  end
+end
+
+class TwitterBackup
+ 
+  include TwitterAPI
+ 
+  def tweets(username,password=nil)
+    all_tweets('/statuses/user_timeline.json',username,password) do |tweet|
+      print(tweet)
+    end
+  end
+  
+  def retweets(username,password=nil)
+    all_tweets('/statuses/retweeted_by_me.json',username,password) do |tweet|
+      print_rt(tweet)
+    end
+  end
+  
+  protected
+    def clean_up(tweet)
+      tweet.gsub("\n"," ").gsub("\r"," ").gsub("\t"," ")
+    end
+  
+    def print_rt(tweet)
+      text = "RT @"+tweet['retweeted_status']['user']['screen_name']+": "+clean_up(tweet['retweeted_status']['text'])
+      put_tweet(tweet,text)
+    end
+  
+    def print(tweet)
+      put_tweet(tweet,clean_up(tweet['text']))
+    end
+    
+    def put_tweet(tweet,text) 
+      id, date = tweet['id'], Time.parse(tweet['created_at']).strftime("%Y-%m-%dT%H:%M:%S%z")
+      puts [id,date,text].join("\t")
+    end
+end
+ 
+TwitterBackup.new.retweets(ARGV[0],ARGV[1])

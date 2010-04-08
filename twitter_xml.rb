@@ -1,12 +1,16 @@
 #!/usr/bin/env ruby
 require 'date'
+require 'rubygems'
+require 'activesupport'
 
 def fix(text)
-  text.gsub!("&","&amp;")
-  text.gsub!(", web,",'')
+  text.gsub!(/&&/,"&amp;&amp;")
+  text.gsub!(/&([^(g|l)])/) {|after| "&amp;#{after[1..-1]}"}
+  text.gsub!(/</) {|after| "&lt;"}
+  text.gsub!(/>/) {|after| "&gt;"}
   text.gsub!(/#[0-9a-zA-Z_]*/) {|tag| "<hashtag>#{tag}</hashtag>" }
   text.gsub!(/@[0-9a-zA-Z_]*/) {|tag| "<name>#{tag}</name>" }
-  text.gsub!(/http:\/\/[0-9A-Za-z_\/\.]*/) {|tag| "<link>#{tag}</link>" }
+  text.gsub!(/http:\/\/[0-9A-Za-z_\/\.\?#-]*/) {|tag| "<link>#{tag}</link>" }
   text
 end
 
@@ -15,10 +19,10 @@ cur_day = ""
 
 puts "<tweets>"
 while (tweet = gets) 
-    date,text = tweet.split("\t")
-    date = DateTime.strptime(date,"%A %d %B %Y at %I:%M%p")
-    month = date.strftime("%B")
-    day = date.strftime("%A %d %B")
+    id, date,text = tweet.split("\t")
+    date = DateTime.strptime(date,"%Y-%m-%dT%H:%M:%S%z")
+    month = date.strftime("%B %Y")
+    day = date.strftime("%A #{date.day.ordinalize} %B")
     time = date.strftime("%I:%M%p").downcase
     
     new_month = (cur_month != month)
