@@ -5,12 +5,12 @@ require 'activesupport'
 
 def fix(text)
   text.gsub!(/&&/,"&amp;&amp;")
-  text.gsub!(/&([^(g|l)])/) {|after| "&amp;#{after[1..-1]}"}
+  text.gsub!(/&(?!gt|lt)/) {|after| "&amp;#{after[1..-1]}"}
   text.gsub!(/</) {|after| "&lt;"}
   text.gsub!(/>/) {|after| "&gt;"}
   text.gsub!(/#[0-9a-zA-Z_]*/) {|tag| "<hashtag>#{tag}</hashtag>" }
   text.gsub!(/@[0-9a-zA-Z_]*/) {|tag| "<name>#{tag}</name>" }
-  text.gsub!(/http:\/\/[0-9A-Za-z_\/\.\?#-]*/) {|tag| "<link>#{tag}</link>" }
+  text.gsub!(/http:\/\/[0-9A-Za-z_\/\.\?=;&#-]*/) {|tag| "<link>#{tag}</link>" }
   text
 end
 
