@@ -2,16 +2,54 @@
 require 'date'
 require 'rubygems'
 require 'activesupport'
+require 'htmlentities'
 
-def fix(text)
-  text.gsub!(/&&/,"&amp;&amp;")
-  text.gsub!(/&(?!gt|lt)/) {|after| "&amp;#{after[1..-1]}"}
-  text.gsub!(/</) {|after| "&lt;"}
-  text.gsub!(/>/) {|after| "&gt;"}
-  text.gsub!(/#[0-9a-zA-Z_]*/) {|tag| "<hashtag>#{tag}</hashtag>" }
-  text.gsub!(/@[0-9a-zA-Z_]*/) {|tag| "<name>#{tag}</name>" }
-  text.gsub!(/http:\/\/[0-9A-Za-z_\/\.\?=;&#-]*/) {|tag| "<link>#{tag}</link>" }
-  text
+# are there maybe dependency problems in the tweetparser gem?
+# Why do I have to do this?
+gem 'polyglot','=0.2.9'
+gem 'treetop','=1.4.2'
+gem 'tweetparser'
+require 'tweetparser'
+
+class String
+  def to_xml
+    unpack('U*').map {|n| 
+      case n
+        when 38
+          "&amp;"
+        when 60
+          "&lt;"
+        when 62
+          "&gt;"
+        when 1..127
+          n.chr
+        else
+          "&##{n};"
+      end
+    }.join
+  end
+  def from_html
+    coder = HTMLEntities.new
+    coder.decode(self)
+  end
+end
+
+def translate(text)
+  parsed = TweetParser.parse(text)
+  parsed.map { |sexp|
+    type, token = *sexp
+    token = token.from_html.to_xml
+    case type
+      when :url
+        "<link>"+token+"</link>"
+      when :username
+        "<name>"+token+"</name>"
+      when :hashtag
+        "<hashtag>"+token+"</hashtag>"
+      else
+        token
+      end
+  }.join("")
 end
 
 cur_month = ""
@@ -43,7 +81,7 @@ while (tweet = gets)
       cur_day = day
     end
 
-    puts "<tweet>#{time}&#160;&#160;#{fix(text)}</tweet>"
+    puts "<tweet>#{time}&#160;&#160;#{translate(text)}</tweet>"
 end
 
 puts "</day>"
